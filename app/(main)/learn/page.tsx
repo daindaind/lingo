@@ -1,7 +1,13 @@
 import FeedWrapper from '@/components/feed-wrapper';
 import { StickyWrapper } from '@/components/sticky-wrapper';
 import { UserProgress } from '@/components/user-progress';
-import { getUnits, getUserProgress } from '@/db/queries';
+import {
+	getCourseProgress,
+	getLessonPercentage,
+	getUnits,
+	getUserProgress,
+} from '@/db/queries';
+import { lessons, units as unitSchema } from '@/db/schema';
 import { redirect } from 'next/navigation';
 
 import { Header } from './header';
@@ -11,13 +17,23 @@ const LearnPage = async () => {
 	const userProgressData = getUserProgress();
 	const unitsData = getUnits();
 
-	const [userProgress, units] = await Promise.all([
-		userProgressData,
-		unitsData,
-	]);
+	const lessonProgressData = getCourseProgress();
+	const lessonPercentageData = getLessonPercentage();
+
+	const [userProgress, units, courseProgress, lessonPercentage] =
+		await Promise.all([
+			userProgressData,
+			unitsData,
+			lessonProgressData,
+			lessonPercentageData,
+		]);
 
 	if (!userProgress || !userProgress.activeCourse) {
 		redirect('/courses'); // return 할 필요 없음
+	}
+
+	if (!courseProgress) {
+		redirect('/courses');
 	}
 
 	return (
@@ -32,8 +48,14 @@ const LearnPage = async () => {
 							description={unit.description}
 							title={unit.title}
 							lessons={unit.lessons}
-							activeLesson={undefined}
-							activeLessonPercentage={0}
+							activeLesson={
+								courseProgress?.activeLesson as
+									| (typeof lessons.$inferSelect & {
+											unit: typeof unitSchema.$inferSelect;
+									  })
+									| undefined
+							}
+							activeLessonPercentage={lessonPercentage || 0}
 						/>
 					</div>
 				))}
