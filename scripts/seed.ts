@@ -4,13 +4,13 @@ import { drizzle } from 'drizzle-orm/neon-http';
 
 import * as schema from '../db/schema';
 
-const sql = neon(process.env.DATABASE_URL);
+const sql = neon(process.env.DATABASE_URL || '');
 
 const db = drizzle(sql, { schema });
 
 const main = async () => {
 	try {
-		console.log('데이터베이스 Seeding');
+		// console.log('데이터베이스 Seeding');
 
 		await db.delete(schema.courses);
 		await db.delete(schema.userProgress);
@@ -62,8 +62,26 @@ const main = async () => {
 			},
 			{
 				id: 2,
-				unitId: 1, // Unit 1 (Learn the basics...)
+				unitId: 1,
 				order: 2,
+				title: 'Verbs',
+			},
+			{
+				id: 3,
+				unitId: 1,
+				order: 3,
+				title: 'Verbs',
+			},
+			{
+				id: 4,
+				unitId: 1,
+				order: 4,
+				title: 'Verbs',
+			},
+			{
+				id: 5,
+				unitId: 1,
+				order: 5,
 				title: 'Verbs',
 			},
 		]);
@@ -105,7 +123,7 @@ const main = async () => {
 			},
 		]);
 
-		console.log('Seeding 끝');
+		// console.log('Seeding 끝');
 	} catch (error) {
 		console.error(error);
 		throw new Error('데이터베이스 seed에 실패했어요ㅜㅡㅜ');
