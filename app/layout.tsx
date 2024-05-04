@@ -1,3 +1,4 @@
+import { ExitModal } from '@/components/modals/exit-modal';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
@@ -22,6 +23,7 @@ export default function RootLayout({
 			<html lang="en">
 				<body className={font.className}>
 					<Toaster />
+					<ExitModal />
 					{children}
 				</body>
 			</html>
