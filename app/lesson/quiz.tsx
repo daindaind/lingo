@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { challengeOptions, challenges } from '@/db/schema';
 
 import { Challenge } from './challenge';
+import { Footer } from './footer';
 import { Header } from './header';
 import { QuestionBubble } from './question-bubble';
 
@@ -35,9 +36,17 @@ const Quiz = ({
 		);
 		return uncompletedIndex === -1 ? 0 : uncompletedIndex;
 	});
+	const [selectedOption, setSelectedOption] = useState<number>();
+	const [state, setState] = useState<'correct' | 'wrong' | 'none'>('none');
 
 	const challenge = challenges[activeIndex];
 	const options = challenge?.challengeOptions ?? [];
+
+	const onSelect = (id: number) => {
+		if (state !== 'none') return;
+
+		setSelectedOption(id);
+	};
 
 	const title =
 		challenge.type === 'ASSIST'
@@ -63,9 +72,9 @@ const Quiz = ({
 							)}
 							<Challenge
 								options={options}
-								onSelect={() => {}}
-								status="none"
-								selectedOption={undefined}
+								onSelect={onSelect}
+								status={state}
+								selectedOption={selectedOption}
 								disabled={false}
 								type={challenge.type}
 							/>
@@ -73,6 +82,7 @@ const Quiz = ({
 					</div>
 				</div>
 			</div>
+			<Footer disabled={!selectedOption} status={state} onCheck={() => {}} />
 		</>
 	);
 };

@@ -1,6 +1,8 @@
 import { challengeOptions, challenges } from '@/db/schema';
 import { cn } from '@/lib/utils';
 
+import { Card } from './card';
+
 type Props = {
 	options: (typeof challengeOptions.$inferSelect)[];
 	onSelect: (id: number) => void;
@@ -27,8 +29,7 @@ export const Challenge = ({
 					'grid-cols-2 lg:grid-cols-[repeat(auto-fit, minmax(0, 1fr))]',
 			)}
 		>
-			{/* Card Component 불러오기 */}
-			{/* {options.map((option, i) => (
+			{options.map((option, i) => (
 				<Card
 					key={option.id}
 					id={option.id}
@@ -37,9 +38,12 @@ export const Challenge = ({
 					shortcut={`${i + 1}`}
 					selected={selectedOption === option.id}
 					onClick={() => onSelect(option.id)}
+					status={status}
 					audioSrc={option.audioSrc}
+					disabled={disabled}
+					type={type}
 				/>
-			))} */}
+			))}
 		</div>
 	);
 };
