@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useAudio } from 'react-use';
 
 import { upsertChallengeProgress } from '@/actions/challenge-progress';
 import { reduceHearts } from '@/actions/user-progress';
@@ -30,6 +31,10 @@ const Quiz = ({
 	userSubscription,
 	initialLessonChallenges,
 }: Props) => {
+	const [correctAudio, _c, correctControls] = useAudio({ src: '/correct.wav' });
+	const [incorrectAudio, _i, incorrectControls] = useAudio({
+		src: '/incorrect.wav',
+	});
 	const [pending, startTransition] = useTransition();
 	const [hearts, setHearts] = useState(initialHearts);
 	const [percentage, setPercentage] = useState(initialPercentage);
@@ -84,7 +89,7 @@ const Quiz = ({
 							console.error('Missing hearts');
 							return;
 						}
-
+						correctControls.play();
 						setState('correct');
 						setPercentage(prev => prev + 100 / challenges.length);
 
@@ -92,7 +97,10 @@ const Quiz = ({
 							setHearts(prev => Math.min(prev + 1, 5));
 						}
 					})
-					.catch(() => toast.error('something wrong. please try again'));
+					.catch(error => {
+						console.error(error);
+						toast.error('something wrong. please try again');
+					});
 			});
 		} else {
 			startTransition(() => {
@@ -103,6 +111,7 @@ const Quiz = ({
 							return;
 						}
 
+						incorrectControls.play();
 						setState('wrong');
 
 						if (!response?.error) {
@@ -122,19 +131,21 @@ const Quiz = ({
 
 	return (
 		<>
+			{incorrectAudio}
+			{correctAudio}
 			<Header
 				hearts={hearts}
 				percentage={percentage}
 				hasActiveSubscription={!!userSubscription?.isActive}
 			/>
 			<div className="flex-1">
-				<div className="h-full flex items-center justify-center">
-					<div className="lg:min-h-[350px] lg:w-[600px] w-full px-6 lg:px-0">
+				<div className="h-full flex items-center justify-center mt-5 mb-10">
+					<div className="flex w-full flex-col gap-y-5 px-6 lg:min-h-[350px] lg:w-[600px] lg:px-0">
 						<h1 className="text-lg lg:text-3xl text-center lg:text-start font-bold text-neutral-700">
 							{title}
 						</h1>
 						<div>
-							{challenge.type === 'SELECT' && (
+							{challenge.type === 'ASSIST' && (
 								<QuestionBubble question={challenge.question} />
 							)}
 							<Challenge

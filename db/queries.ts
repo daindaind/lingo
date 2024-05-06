@@ -192,16 +192,21 @@ export const getLessonPercentage = cache(async () => {
 		return 0;
 	}
 
-	const lesson = await getLesson(courseProgress.activeLessonId);
+	const lesson = await getLesson(courseProgress?.activeLessonId);
 
 	if (!lesson) {
 		return 0;
 	}
 
-	const completedChallenges = lesson.challenges;
+	const completedChallenges = lesson.challenges.filter(
+		challenge => challenge.completed,
+	);
+
 	const percentage = Math.round(
 		(completedChallenges.length / lesson.challenges.length) * 100,
 	);
+
+	// console.log(completedChallenges);
 
 	return percentage;
 });

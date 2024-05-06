@@ -1,4 +1,4 @@
-'use client';
+'use server';
 
 import db from '@/db/drizzle';
 import { getUserProgress } from '@/db/queries';
@@ -30,6 +30,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
 	}
 
 	const lessonId = challenge.lessonId;
+
 	const exitingChallengeProgress = await db.query.challengeProgress.findFirst({
 		where: and(
 			eq(challengeProgress.userId, userId),

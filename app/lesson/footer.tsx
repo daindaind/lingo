@@ -18,7 +18,7 @@ export const Footer = ({ onCheck, status, disabled, lessonId }: Props) => {
 	return (
 		<footer
 			className={cn(
-				'lg:-h[140px] h-[100px] border-t-2',
+				'lg:-h[140px] h-[100px] border-t-2 p-10',
 				status === 'correct' && 'border-transparent bg-green-100',
 				status === 'wrong' && 'border-transparent bg-rose-100',
 			)}

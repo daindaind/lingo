@@ -20,28 +20,31 @@ const main = async () => {
 		await db.delete(schema.challengeOptions);
 		await db.delete(schema.challengeProgress);
 
-		await db.insert(schema.courses).values([
-			{
-				id: 1,
-				title: 'Spanish',
-				imageSrc: '/es.svg',
-			},
-			{
-				id: 2,
-				title: 'Italian',
-				imageSrc: '/it.svg',
-			},
-			{
-				id: 3,
-				title: 'French',
-				imageSrc: '/fr.svg',
-			},
-			{
-				id: 4,
-				title: 'Croatian',
-				imageSrc: '/hr.svg',
-			},
-		]);
+		await db
+			.insert(schema.courses)
+			.values([
+				{
+					id: 1,
+					title: 'Spanish',
+					imageSrc: '/es.svg',
+				},
+				{
+					id: 2,
+					title: 'Italian',
+					imageSrc: '/it.svg',
+				},
+				{
+					id: 3,
+					title: 'French',
+					imageSrc: '/fr.svg',
+				},
+				{
+					id: 4,
+					title: 'Croatian',
+					imageSrc: '/hr.svg',
+				},
+			])
+			.returning();
 
 		await db.insert(schema.units).values([
 			{
@@ -111,6 +114,45 @@ const main = async () => {
 		]);
 
 		await db.insert(schema.challengeOptions).values([
+			{
+				challengeId: 1,
+				imageSrc: '/man.svg',
+				correct: true,
+				text: 'el hombre',
+				audioSrc: '/es_man.mp3',
+			},
+			{
+				challengeId: 1,
+				imageSrc: '/woman.svg',
+				correct: false,
+				text: 'la mujer',
+				audioSrc: '/es_woman.mp3',
+			},
+			{
+				challengeId: 1,
+				imageSrc: '/robot.svg',
+				correct: false,
+				text: 'la robot',
+				audioSrc: '/es_robot.mp3',
+			},
+			{
+				challengeId: 2,
+				correct: true,
+				text: 'el hombre',
+				audioSrc: '/es_man.mp3',
+			},
+			{
+				challengeId: 2,
+				correct: false,
+				text: 'la mujer',
+				audioSrc: '/es_woman.mp3',
+			},
+			{
+				challengeId: 2,
+				correct: false,
+				text: 'la robot',
+				audioSrc: '/es_robot.mp3',
+			},
 			{
 				challengeId: 3,
 				imageSrc: '/man.svg',
