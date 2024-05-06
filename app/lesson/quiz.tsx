@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
+import { upsertChallengeProgress } from '@/actions/challenge-progress';
+import { reduceHearts } from '@/actions/user-progress';
 import { challengeOptions, challenges } from '@/db/schema';
+import { toast } from 'sonner';
 
 import { Challenge } from './challenge';
 import { Footer } from './footer';
@@ -21,12 +24,13 @@ type Props = {
 };
 
 const Quiz = ({
-	initialLessenId,
+	// initialLessenId,
 	initialHearts,
 	initialPercentage,
 	userSubscription,
 	initialLessonChallenges,
 }: Props) => {
+	const [pending, startTransition] = useTransition();
 	const [hearts, setHearts] = useState(initialHearts);
 	const [percentage, setPercentage] = useState(initialPercentage);
 	const [challenges] = useState(initialLessonChallenges);
@@ -42,10 +46,73 @@ const Quiz = ({
 	const challenge = challenges[activeIndex];
 	const options = challenge?.challengeOptions ?? [];
 
+	const onNext = () => {
+		setActiveIndex(current => current + 1);
+	};
+
 	const onSelect = (id: number) => {
 		if (state !== 'none') return;
 
 		setSelectedOption(id);
+	};
+
+	const onContinue = () => {
+		if (!selectedOption) return;
+
+		if (state === 'wrong') {
+			setState('none');
+			setSelectedOption(undefined);
+			return;
+		}
+
+		if (state === 'correct') {
+			onNext();
+			setState('none');
+			setSelectedOption(undefined);
+			return;
+		}
+
+		const correctOption = options.find(option => option.correct);
+
+		if (!correctOption) return;
+
+		if (correctOption.id === selectedOption) {
+			startTransition(() => {
+				upsertChallengeProgress(challenge.id)
+					.then(response => {
+						if (response?.error === 'hearts') {
+							console.error('Missing hearts');
+							return;
+						}
+
+						setState('correct');
+						setPercentage(prev => prev + 100 / challenges.length);
+
+						if (initialPercentage === 100) {
+							setHearts(prev => Math.min(prev + 1, 5));
+						}
+					})
+					.catch(() => toast.error('something wrong. please try again'));
+			});
+		} else {
+			startTransition(() => {
+				reduceHearts(challenge.id)
+					.then(response => {
+						if (response?.error === 'hearts') {
+							console.error('Missing hearts');
+							return;
+						}
+
+						setState('wrong');
+
+						if (!response?.error) {
+							setHearts(prev => Math.max(prev - 1, 0));
+						}
+					})
+
+					.catch(() => toast.error('Something went wrong, please try again.'));
+			});
+		}
 	};
 
 	const title =
@@ -82,7 +149,7 @@ const Quiz = ({
 					</div>
 				</div>
 			</div>
-			<Footer disabled={!selectedOption} status={state} onCheck={() => {}} />
+			<Footer disabled={!selectedOption} status={state} onCheck={onContinue} />
 		</>
 	);
 };

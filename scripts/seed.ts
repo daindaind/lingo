@@ -94,30 +94,41 @@ const main = async () => {
 				order: 1,
 				question: 'Which one of these is the "the man"?',
 			},
+			{
+				id: 2,
+				lessonId: 1, // Verbs
+				type: 'ASSIST',
+				order: 2,
+				question: 'the man',
+			},
+			{
+				id: 3,
+				lessonId: 1, // Verbs
+				type: 'SELECT',
+				order: 3,
+				question: 'Which one of these is the "the robot"?',
+			},
 		]);
 
 		await db.insert(schema.challengeOptions).values([
 			{
-				id: 1,
-				challengeId: 1, // 'Which one of these is the "the man"?'
+				challengeId: 3,
 				imageSrc: '/man.svg',
-				correct: true,
+				correct: false,
 				text: 'el hombre',
 				audioSrc: '/es_man.mp3',
 			},
 			{
-				id: 2,
-				challengeId: 1,
+				challengeId: 3,
 				imageSrc: '/woman.svg',
 				correct: false,
 				text: 'la mujer',
 				audioSrc: '/es_woman.mp3',
 			},
 			{
-				id: 3,
-				challengeId: 1,
+				challengeId: 3,
 				imageSrc: '/robot.svg',
-				correct: false,
+				correct: true,
 				text: 'la robot',
 				audioSrc: '/es_robot.mp3',
 			},
