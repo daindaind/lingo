@@ -2,20 +2,25 @@ import FeedWrapper from '@/components/feed-wrapper';
 import { Promo } from '@/components/Promo';
 import { Quests } from '@/components/quests';
 import { StickyWrapper } from '@/components/sticky-wrapper';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { UserProgress } from '@/components/user-progress';
-import { getUserProgress, getUserSubscription } from '@/db/queries';
+import {
+	getTopTenUsers,
+	getUserProgress,
+	getUserSubscription,
+} from '@/db/queries';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
-import { Items } from './items';
-
-const ShopPage = async () => {
+const LeaderboardPage = async () => {
 	const userProgressData = await getUserProgress();
 	const userSubscriptionData = await getUserSubscription();
+	const leaderboardData = await getTopTenUsers();
 
-	const [userProgress, userSubscription] = await Promise.all([
+	const [userProgress, userSubscription, leaderboard] = await Promise.all([
 		userProgressData,
 		userSubscriptionData,
+		leaderboardData,
 	]);
 
 	if (!userProgress || !userProgress.activeCourse) {
@@ -38,22 +43,32 @@ const ShopPage = async () => {
 			</StickyWrapper>
 			<FeedWrapper>
 				<div className="w-full flex flex-col items-center">
-					<Image src="/shop.svg" alt="Shop" height={90} width={90} />
+					<Image src="/leaderboard.svg" alt="Leaderboard" height={90} width={90} />
 					<h1 className="text-center font-bold text-neutral-800 text-2xl my-6">
-						Shop
+						Leaderboard
 					</h1>
 					<p className="text-muted-foreground text-center text-lg mb-6">
-						Spend your points on cool stuff.
+						See where you stand among other learners in the community.
 					</p>
-					<Items
-						hearts={userProgress.hearts}
-						points={userProgress.points}
-						hasActiveSubscription={isPro}
-					/>
+					{leaderboard.map((userProgress, index) => (
+						<div
+							key={userProgress.userId}
+							className="flex items-center w-full p-2 px-4 rounded-xl hover:bg-gray-200/50"
+						>
+							<p className="font-bold text-lime-700 mr-4">{index + 1}</p>
+							<Avatar className="border bg-green-500 h-12 w-12 ml-3 mr-6">
+								<AvatarImage className="object-cover" src={userProgress.userImageSrc} />
+							</Avatar>
+							<p className="font-bold text-neutral-800 flex-1">
+								{userProgress.userName}
+							</p>
+							<p className="text-muted-foreground">{userProgress.points} XP</p>
+						</div>
+					))}
 				</div>
 			</FeedWrapper>
 		</div>
 	);
 };
 
-export default ShopPage;
+export default LeaderboardPage;

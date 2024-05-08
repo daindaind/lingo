@@ -19,7 +19,7 @@ export const Items = ({ hearts, points, hasActiveSubscription }: Props) => {
 	const [pending, startTransition] = useTransition();
 
 	const onRefillHearts = () => {
-		if (pending || hearts === 5 || hearts < POINTS_TO_REFILL) {
+		if (pending || hearts === 5 || hearts > POINTS_TO_REFILL) {
 			return;
 		}
 
