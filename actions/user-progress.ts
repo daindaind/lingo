@@ -1,5 +1,7 @@
 'use server';
 
+// TODO: 나중에 constant 파일로 빼기
+import { POINTS_TO_REFILL } from '@/app/(main)/shop/items';
 import db from '@/db/drizzle';
 import { getCourseById, getUserProgress } from '@/db/queries';
 import { challengeProgress, challenges, userProgress } from '@/db/schema';
@@ -106,4 +108,33 @@ export const reduceHearts = async (challengeId: number) => {
 	revalidatePath('/quests');
 	revalidatePath('/leaderboard');
 	revalidatePath(`/lesson/${lessonId}`);
+};
+
+export const refillHearts = async () => {
+	const currentuserProgress = await getUserProgress();
+
+	if (!currentuserProgress) {
+		throw new Error('User progress not found');
+	}
+
+	if (currentuserProgress.hearts === 5) {
+		throw new Error('Hearts are aleady full');
+	}
+
+	if (currentuserProgress.points < POINTS_TO_REFILL) {
+		throw new Error('Not enough points');
+	}
+
+	await db
+		.update(userProgress)
+		.set({
+			hearts: 5,
+			points: currentuserProgress.points - POINTS_TO_REFILL,
+		})
+		.where(eq(userProgress.userId, currentuserProgress.userId));
+
+	revalidatePath('/shop');
+	revalidatePath('/learn');
+	revalidatePath('/quests');
+	revalidatePath('/leaderboard');
 };
