@@ -6,6 +6,7 @@ import {
 	getLessonPercentage,
 	getUnits,
 	getUserProgress,
+	getUserSubscription,
 } from '@/db/queries';
 import { lessons, units as unitSchema } from '@/db/schema';
 import { redirect } from 'next/navigation';
@@ -16,17 +17,23 @@ import { Unit } from './unit';
 const LearnPage = async () => {
 	const userProgressData = getUserProgress();
 	const unitsData = getUnits();
-
 	const lessonProgressData = getCourseProgress();
 	const lessonPercentageData = getLessonPercentage();
+	const userSubscriptionData = getUserSubscription();
 
-	const [userProgress, units, courseProgress, lessonPercentage] =
-		await Promise.all([
-			userProgressData,
-			unitsData,
-			lessonProgressData,
-			lessonPercentageData,
-		]);
+	const [
+		userProgress,
+		units,
+		courseProgress,
+		lessonPercentage,
+		userSubscription,
+	] = await Promise.all([
+		userProgressData,
+		unitsData,
+		lessonProgressData,
+		lessonPercentageData,
+		userSubscriptionData,
+	]);
 
 	if (!userProgress || !userProgress.activeCourse) {
 		redirect('/courses'); // return 할 필요 없음
@@ -65,7 +72,7 @@ const LearnPage = async () => {
 					activeCourse={userProgress.activeCourse}
 					hearts={userProgress.hearts}
 					points={userProgress.points}
-					hasActiveSubscription={false}
+					hasActiveSubscription={!!userSubscription?.isActive}
 				/>
 			</StickyWrapper>
 		</div>

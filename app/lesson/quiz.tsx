@@ -6,7 +6,7 @@ import { useAudio, useMount, useWindowSize } from 'react-use';
 
 import { upsertChallengeProgress } from '@/actions/challenge-progress';
 import { reduceHearts } from '@/actions/user-progress';
-import { challengeOptions, challenges } from '@/db/schema';
+import { challengeOptions, challenges, userSubscription } from '@/db/schema';
 import { useHeartsModal } from '@/store/use-hearts-modal';
 import { usePracticeModal } from '@/store/use-practice-modal';
 import Image from 'next/image';
@@ -23,7 +23,11 @@ type Props = {
 	initialLessenId: number;
 	initialHearts: number;
 	initialPercentage: number;
-	userSubscription: any; //TODO: repace with subscription DB type
+	userSubscription:
+		| (typeof userSubscription.$inferSelect & {
+				isActive: boolean;
+		  })
+		| null;
 	initialLessonChallenges: (typeof challenges.$inferSelect & {
 		completed: boolean;
 		challengeOptions: (typeof challengeOptions.$inferSelect)[];
